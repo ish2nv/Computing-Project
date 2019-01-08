@@ -1,0 +1,3 @@
+* login one-to-one with speech recognition: one account can have one registered word
+* login one-to-many with create_account: one password in login can be written many times in create_account by other users i.e. multiple users can have same password
+* keras_model one-to-one with speech_recognition: one prediction can be made at every attempt
