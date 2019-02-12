@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.radar.speech.speechradar">
+
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity
+            android:name=".loginscreen"
+            android:label="@string/login_screen_actionbar_title">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".createaccount"
+            android:label="@string/createaccount_actionbar_title" />
+        <activity
+            android:name=".speechrecognition"
+            android:label="@string/speechrecognition_actionbar_title" />
+
+        <activity android:name=".forgotPassword"
+            android:label="@string/forgotPassword_actionbar_title"></activity>
+    </application>
+
+</manifest>

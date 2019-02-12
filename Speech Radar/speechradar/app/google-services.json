@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "889272832322",
+    "firebase_url": "https://speech-radar.firebaseio.com",
+    "project_id": "speech-radar",
+    "storage_bucket": "speech-radar.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:889272832322:android:730163327031fca4",
+        "android_client_info": {
+          "package_name": "com.radar.speech.speechradar"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "889272832322-4823plnkoj657v2ngab3p7vvcn76l7m4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.radar.speech.speechradar",
+            "certificate_hash": "3d5a6b20e07b80745d2aa9387bf8dfa3bccf1751"
+          }
+        },
+        {
+          "client_id": "889272832322-orqrt3nf03p9tactakmd9r4a9i63047e.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCzUkyl8TXCX3LO6-lwcAB9Hju9CdtgsHk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "889272832322-orqrt3nf03p9tactakmd9r4a9i63047e.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

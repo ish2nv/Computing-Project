@@ -1,0 +1,7 @@
+<resources>
+    <string name="login_screen_actionbar_title">Login Screen</string>
+    <string name="createaccount_actionbar_title">Create Account</string>
+    <string name="speechrecognition_actionbar_title">Speech Recognition</string>
+    <string name="forgotPassword_actionbar_title">Forgot Password</string>
+
+</resources>
