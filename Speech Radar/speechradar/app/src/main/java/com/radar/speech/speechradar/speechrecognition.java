@@ -1,21 +1,20 @@
 package com.radar.speech.speechradar;
 
 import android.Manifest;
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.media.AudioFormat;
-import android.media.AudioRecord;
-import android.media.MediaRecorder;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.RingtoneManager;
 import android.net.Uri;
-import android.net.rtp.AudioStream;
 import android.os.Build;
 import android.provider.Settings;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -25,35 +24,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
+import com.afollestad.materialdialogs.MaterialDialog.Builder;
+import com.afollestad.materialdialogs.Theme;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.radar.speech.speechradar.models.Classification;
-import com.radar.speech.speechradar.models.Classifier;
-import com.radar.speech.speechradar.models.MFCC;
-import com.radar.speech.speechradar.models.TensorflowClassifier;
-import com.radar.speech.speechradar.models.WavRecorder;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.EOFException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Locale;
-import java.util.Random;
 
 public class speechrecognition extends loginscreen {
     private static final int shape = 20;
@@ -65,7 +45,8 @@ public class speechrecognition extends loginscreen {
     String oneWord;
     DatabaseReference myRef2;
     DatabaseReference child2;
-
+     Button service;
+     AudioManager audioManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)  {
@@ -75,7 +56,27 @@ public class speechrecognition extends loginscreen {
         userEmail = (EditText) findViewById(R.id.emaillogin);
         maintitle = (TextView) findViewById(R.id.mainTitle);
         ourtext = (TextView) findViewById(R.id.speechtotext);
+        service = (Button) findViewById(R.id.Service);
         speechrecognitionmic = (ImageView) findViewById(R.id.speechrec);
+
+        enableAutoStart();
+        if (checkServiceRunning()) {
+            service.setText("stop service");
+        }
+
+        service.setOnClickListener(v -> {
+            if (service.getText().toString().equalsIgnoreCase("start service")) {
+                startService(new Intent(speechrecognition.this, MyService.class));
+                service.setText("stop service");
+            } else {
+                stopService(new Intent(speechrecognition.this, MyService.class));
+                service.setText("start service");
+            }
+
+
+
+        });
+
         final SpeechRecognizer mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
 
         final Intent mSpeechRecognizerIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
@@ -198,6 +199,49 @@ public class speechrecognition extends loginscreen {
             }
         });
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    private void enableAutoStart() {
+        for (Intent intent : Constants.AUTO_START_INTENTS) {
+            if (getPackageManager().resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY) != null) {
+                new Builder(this).title("Enable AutoStart")
+                        .content(R.string.ask_permission)
+                        .theme(Theme.LIGHT)
+                        .positiveText(getString(R.string.allow))
+                        .onPositive((dialog, which) -> {
+                            try {
+                                for (Intent intent1 : Constants.AUTO_START_INTENTS)
+                                    if (getPackageManager().resolveActivity(intent1, PackageManager.MATCH_DEFAULT_ONLY)
+                                            != null) {
+                                        startActivity(intent1);
+                                        break;
+                                    }
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        })
+                        .show();
+                break;
+            }
+        }
+    }
+
+    public boolean checkServiceRunning() {
+        ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+        if (manager != null) {
+            for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(
+                    Integer.MAX_VALUE)) {
+                if (getString(R.string.my_service_name).equals(service.service.getClassName())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private void checkPermission() {
