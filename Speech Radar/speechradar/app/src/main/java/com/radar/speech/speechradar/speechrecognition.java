@@ -1,15 +1,12 @@
 package com.radar.speech.speechradar;
 
 import android.Manifest;
-import android.app.ActivityManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.media.AudioManager;
-import android.media.MediaPlayer;
-import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.CountDownTimer;
 import android.provider.Settings;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
@@ -18,14 +15,17 @@ import android.support.v4.content.ContextCompat;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
-import com.afollestad.materialdialogs.MaterialDialog.Builder;
-import com.afollestad.materialdialogs.Theme;
+
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -40,13 +40,23 @@ public class speechrecognition extends loginscreen {
 
     TextView maintitle;
     TextView ourtext;
+    TextView taptospeak;
+    TextView saving;
+    ScrollView scrollView;
+
+    public static String firstWord;
     EditText userEmail;
     ImageView speechrecognitionmic;
     String oneWord;
     DatabaseReference myRef2;
     DatabaseReference child2;
-     Button service;
+     Button saveCodeWordinDB;
      AudioManager audioManager;
+    FirebaseDatabase  database = FirebaseDatabase.getInstance();
+    DatabaseReference mDatabaseRef = database.getReference();
+    ProgressBar mProgressBar;
+    CountDownTimer mCountDownTimer;
+    int i=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)  {
@@ -55,27 +65,21 @@ public class speechrecognition extends loginscreen {
         checkPermission();
         userEmail = (EditText) findViewById(R.id.emaillogin);
         maintitle = (TextView) findViewById(R.id.mainTitle);
+        taptospeak = (TextView) findViewById(R.id.tapspeak);
         ourtext = (TextView) findViewById(R.id.speechtotext);
-        service = (Button) findViewById(R.id.Service);
-        speechrecognitionmic = (ImageView) findViewById(R.id.speechrec);
+        mProgressBar=(ProgressBar)findViewById(R.id.progressBar);
+        mProgressBar.setVisibility(View.INVISIBLE);
+        saveCodeWordinDB = (Button) findViewById(R.id.saveCodeWord);
+        scrollView = (ScrollView) findViewById(R.id.scrolling);
+        speechrecognitionmic = (ImageView) findViewById(R.id.speechrecognitionmic);
+        saving = (TextView) findViewById(R.id.save);
+        speechrecognitionmic.startAnimation(AnimationUtils.loadAnimation(speechrecognition.this,android.R.anim.slide_in_left));
+        ourtext.startAnimation(AnimationUtils.loadAnimation(speechrecognition.this,android.R.anim.slide_in_left));
+        taptospeak.startAnimation(AnimationUtils.loadAnimation(speechrecognition.this,android.R.anim.slide_in_left));
+        saveCodeWordinDB.startAnimation(AnimationUtils.loadAnimation(speechrecognition.this,android.R.anim.slide_in_left));
 
-        enableAutoStart();
-        if (checkServiceRunning()) {
-            service.setText("stop service");
-        }
+        saving.setVisibility(View.INVISIBLE);
 
-        service.setOnClickListener(v -> {
-            if (service.getText().toString().equalsIgnoreCase("start service")) {
-                startService(new Intent(speechrecognition.this, MyService.class));
-                service.setText("stop service");
-            } else {
-                stopService(new Intent(speechrecognition.this, MyService.class));
-                service.setText("start service");
-            }
-
-
-
-        });
 
         final SpeechRecognizer mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
 
@@ -109,6 +113,8 @@ public class speechrecognition extends loginscreen {
 
                 System.out.println(secondWord);
                 maintitle.setText("Hello " + secondWord);
+                maintitle.startAnimation(AnimationUtils.loadAnimation(speechrecognition.this,android.R.anim.slide_in_left));
+
 
             }
 
@@ -147,6 +153,7 @@ public class speechrecognition extends loginscreen {
             @Override
             public void onError(int i) {
                 speechrecognitionmic.setImageResource(R.drawable.redmic);
+                taptospeak.setVisibility(View.VISIBLE);
                 ourtext.setHint("");
 
             }
@@ -159,11 +166,13 @@ public class speechrecognition extends loginscreen {
 
                 //displaying the first match
                 if (matches != null)
-                    oneWord = matches.get(0);
-                String arr[] = oneWord.split(" ");
-                String firstWord = arr[0];   //the
-                speechrecognitionmic.setImageResource(R.drawable.redmic);
-                ourtext.setText(firstWord);
+                      oneWord = matches.get(0);
+                      String arr[] = oneWord.split(" ");
+                      firstWord = arr[0];   //the
+                      speechrecognitionmic.setImageResource(R.drawable.redmic);
+                      taptospeak.setVisibility(View.VISIBLE);
+                      ourtext.setText("Code word: " + firstWord);    //extract this variable into the MyService class
+
             }
 
             @Override
@@ -185,12 +194,14 @@ public class speechrecognition extends loginscreen {
                     case MotionEvent.ACTION_UP:
                         mSpeechRecognizer.stopListening();
                         speechrecognitionmic.setImageResource(R.drawable.redmic);
+                        taptospeak.setVisibility(view.VISIBLE);
 
                         break;
 
                     case MotionEvent.ACTION_DOWN:
                         mSpeechRecognizer.startListening(mSpeechRecognizerIntent);
                         speechrecognitionmic.setImageResource(R.drawable.greenmic);
+                        taptospeak.setVisibility(view.INVISIBLE);
                         ourtext.setText("");
                         ourtext.setHint("Listening...");
                         break;
@@ -199,50 +210,51 @@ public class speechrecognition extends loginscreen {
             }
         });
 
-    }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
+            saveCodeWordinDB.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mProgressBar.setProgress(i);
+                    mCountDownTimer=new CountDownTimer(4000,1000) {
 
-    private void enableAutoStart() {
-        for (Intent intent : Constants.AUTO_START_INTENTS) {
-            if (getPackageManager().resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY) != null) {
-                new Builder(this).title("Enable AutoStart")
-                        .content(R.string.ask_permission)
-                        .theme(Theme.LIGHT)
-                        .positiveText(getString(R.string.allow))
-                        .onPositive((dialog, which) -> {
-                            try {
-                                for (Intent intent1 : Constants.AUTO_START_INTENTS)
-                                    if (getPackageManager().resolveActivity(intent1, PackageManager.MATCH_DEFAULT_ONLY)
-                                            != null) {
-                                        startActivity(intent1);
-                                        break;
-                                    }
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        })
-                        .show();
-                break;
-            }
-        }
-    }
+                        @Override
+                        public void onTick(long millisUntilFinished) {
+                            i++;
+                            mProgressBar.setVisibility(View.VISIBLE);
+                            saving.setVisibility(View.VISIBLE);
+                            mProgressBar.setProgress((int)i*100/(5000/1000));
 
-    public boolean checkServiceRunning() {
-        ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
-        if (manager != null) {
-            for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(
-                    Integer.MAX_VALUE)) {
-                if (getString(R.string.my_service_name).equals(service.service.getClassName())) {
-                    return true;
+
+
+                            scrollView.post(new Runnable() {
+                                public void run() {
+                                    scrollView.fullScroll(View.FOCUS_DOWN);
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onFinish() {
+                            //Do what you want
+                            i++;
+                            mProgressBar.setProgress(100);
+                            Bundle extras = getIntent().getExtras();
+                            String value = extras.getString("email_var");
+                            mDatabaseRef.child(value).child("codeWord").setValue(firstWord);
+                            Intent i = new Intent(speechrecognition.this, BackgroundService.class);
+                            i.putExtra("email_var2",firstWord);
+                            startActivity(i);
+                        }
+                    };
+                    mCountDownTimer.start();
+
                 }
-            }
+            });
+
+
         }
-        return false;
-    }
+
+
 
     private void checkPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -262,7 +274,17 @@ public class speechrecognition extends loginscreen {
         inflater.inflate(R.menu.speechrecognition_menu, menu);
         return true;
     }
-
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.menu_home:
+                startActivity(new Intent(speechrecognition.this, loginscreen.class));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
 
 

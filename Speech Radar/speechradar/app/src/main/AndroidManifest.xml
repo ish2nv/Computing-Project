@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.radar.speech.speechradar">
-    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
-    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" ></uses-permission>
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -26,14 +28,16 @@
             android:label="@string/createaccount_actionbar_title" />
         <activity
             android:name=".speechrecognition"
-            android:label="@string/speechrecognition_actionbar_title" />
+            android:label="@string/speechrecognition_actionbar_title"
+            android:noHistory="true"/>
+        <activity
+            android:name=".forgotPassword"
+            android:label="@string/forgotPassword_actionbar_title" />
 
-        <activity android:name=".forgotPassword"
-            android:label="@string/forgotPassword_actionbar_title"></activity>
-        <service
-            android:name="com.radar.speech.speechradar.MyService"
-            >
-        </service>
+        <service android:name=".MyService"></service>
+
+        <activity android:name=".BackgroundService"
+                  android:label="@string/BackgroundService_actionbar_title"></activity>
     </application>
 
 </manifest>

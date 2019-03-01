@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -41,6 +42,15 @@ public class createaccount extends AppCompatActivity {
         conf_password = (EditText)findViewById(R.id.conf_password);
         email_address = (EditText)findViewById(R.id.email_address);
         firebaseAuth = FirebaseAuth.getInstance();
+
+        fname.startAnimation(AnimationUtils.loadAnimation(createaccount.this,android.R.anim.slide_in_left));
+        lname.startAnimation(AnimationUtils.loadAnimation(createaccount.this,android.R.anim.slide_in_left));
+        password.startAnimation(AnimationUtils.loadAnimation(createaccount.this,android.R.anim.slide_in_left));
+        conf_password.startAnimation(AnimationUtils.loadAnimation(createaccount.this,android.R.anim.slide_in_left));
+        email_address.startAnimation(AnimationUtils.loadAnimation(createaccount.this,android.R.anim.slide_in_left));
+        createAccountbtn.startAnimation(AnimationUtils.loadAnimation(createaccount.this,android.R.anim.slide_in_left));
+
+
         AddData();
 
         }

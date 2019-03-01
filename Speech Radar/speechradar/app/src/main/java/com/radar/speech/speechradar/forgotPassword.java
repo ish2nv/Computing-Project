@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -23,6 +24,9 @@ public class forgotPassword extends AppCompatActivity {
         setContentView(R.layout.activity_forgot_password);
         resetpass = (Button)findViewById(R.id.passwordreset);
         email = (EditText) findViewById(R.id.enteremail) ;
+        resetpass.startAnimation(AnimationUtils.loadAnimation(forgotPassword.this,android.R.anim.slide_in_left));
+        email.startAnimation(AnimationUtils.loadAnimation(forgotPassword.this,android.R.anim.slide_in_left));
+
         send_password_reset_email();
 
     }

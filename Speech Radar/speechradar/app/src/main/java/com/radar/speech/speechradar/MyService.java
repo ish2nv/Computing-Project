@@ -40,14 +40,6 @@ public class MyService extends Service implements SpeechDelegate, Speech.stopDue
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        try {
-            if (VERSION.SDK_INT >= VERSION_CODES.KITKAT) {
-                ((AudioManager) Objects.requireNonNull(
-                        getSystemService(Context.AUDIO_SERVICE))).setStreamMute(AudioManager.STREAM_SYSTEM, true);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
         Speech.init(this);
         delegate = this;
@@ -100,17 +92,19 @@ public class MyService extends Service implements SpeechDelegate, Speech.stopDue
 
     @Override
     public void onSpeechResult(String result) {
+
+      String val = BackgroundService.values2;
+      System.out.println("the codeWord is: " + val);
         ArrayList<String> a = new ArrayList<String>();
         Log.d("Result", result+"");
         if (!TextUtils.isEmpty(result)) {
             Toast.makeText(this, result, Toast.LENGTH_SHORT).show();
 
         }
-
-        if(result.equals("left")) {
+        if(result.equals(val)) {
             a.add(result);
         }
-        if(a.get(0).equals("left")) {
+        if(a.get(0).equals(val)) {
             muteBeepSoundOfRecorders();
             player = MediaPlayer.create(this,
                     Settings.System.DEFAULT_RINGTONE_URI);

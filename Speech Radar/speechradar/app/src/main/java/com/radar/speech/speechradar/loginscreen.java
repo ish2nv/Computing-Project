@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -33,6 +34,7 @@ public class loginscreen extends AppCompatActivity {
     EditText userPass;
     TextView createAccountLink;
     TextView forgotpassword;
+    TextView maintitle2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +47,15 @@ public class loginscreen extends AppCompatActivity {
         createAccountLink = (TextView) findViewById(R.id.createaccountlink);
         forgotpassword = (TextView) findViewById(R.id.forgotPassword);
         firebaseAuth = FirebaseAuth.getInstance();
+        maintitle2 = (TextView) findViewById(R.id.title) ;
+
+        loginbutton.startAnimation(AnimationUtils.loadAnimation(loginscreen.this,android.R.anim.slide_in_left));
+        forgotpassword.startAnimation(AnimationUtils.loadAnimation(loginscreen.this,android.R.anim.slide_in_left));
+        createAccountLink.startAnimation(AnimationUtils.loadAnimation(loginscreen.this,android.R.anim.slide_in_left));
+        userEmail.startAnimation(AnimationUtils.loadAnimation(loginscreen.this,android.R.anim.slide_in_left));
+        userPass.startAnimation(AnimationUtils.loadAnimation(loginscreen.this,android.R.anim.slide_in_left));
+        maintitle2.startAnimation(AnimationUtils.loadAnimation(loginscreen.this,android.R.anim.slide_in_left));
+
 
         createAccountLink.setOnClickListener(new View.OnClickListener() {
             @Override
