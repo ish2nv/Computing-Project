@@ -1,10 +1,13 @@
 apply plugin: 'com.android.application'
 
 android {
+    packagingOptions {
+        pickFirst 'META-INF/LICENSE.txt' // picks the JavaMail license file
+    }
     compileSdkVersion 27
     defaultConfig {
         applicationId "com.radar.speech.speechradar"
-        minSdkVersion 15
+        minSdkVersion 17
         targetSdkVersion 27
         versionCode 1
         versionName "1.0"
@@ -31,14 +34,14 @@ dependencies {
     implementation 'io.reactivex:rxandroid:1.2.1'
     implementation 'com.afollestad.material-dialogs:core:0.9.4.2'
     implementation 'me.biubiubiu.justifytext:library:1.1'
-    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
-
+    implementation 'com.github.faruktoptas:FancyShowCaseView:0.0.3'
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'org.tensorflow:tensorflow-android:1.10.0'
-
+    implementation 'com.sun.mail:android-mail:1.6.2'
+    implementation 'com.sun.mail:android-activation:1.6.2'
 
     implementation project(path: ':speech')
 }

@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.radar.speech.speechradar">
-
+<supports-screens
+    android:largeScreens="true"
+    android:normalScreens="true"
+    android:smallScreens="true"
+    android:xlargeScreens="true"></supports-screens>
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
     <application
@@ -16,6 +19,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".loginscreen"
+            android:screenOrientation="portrait"
             android:label="@string/login_screen_actionbar_title">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,19 +29,27 @@
         </activity>
         <activity
             android:name=".createaccount"
+            android:screenOrientation="portrait"
             android:label="@string/createaccount_actionbar_title" />
         <activity
             android:name=".speechrecognition"
+            android:screenOrientation="portrait"
             android:label="@string/speechrecognition_actionbar_title"
-            android:noHistory="true"/>
+            android:noHistory="true" />
         <activity
             android:name=".forgotPassword"
+            android:screenOrientation="portrait"
             android:label="@string/forgotPassword_actionbar_title" />
 
-        <service android:name=".MyService"></service>
+        <service
+            android:name=".MyService"
+            android:screenOrientation="portrait"
+            android:enabled="true" />
 
-        <activity android:name=".BackgroundService"
-                  android:label="@string/BackgroundService_actionbar_title"></activity>
+        <activity
+            android:name=".BackgroundService"
+            android:screenOrientation="portrait"
+            android:label="@string/BackgroundService_actionbar_title" />
     </application>
 
 </manifest>

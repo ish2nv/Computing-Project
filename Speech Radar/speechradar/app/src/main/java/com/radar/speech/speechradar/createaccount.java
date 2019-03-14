@@ -1,8 +1,15 @@
 package com.radar.speech.speechradar;
 
+import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
@@ -19,11 +26,15 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+
 public class createaccount extends AppCompatActivity {
     Button createAccountbtn;
     EditText fname,lname,password,conf_password,email_address;
     FirebaseAuth firebaseAuth;
     DatabaseReference myRef;
+    private long mLastClickTime;
 
     private final static String salt="DGE$5SGr@3VsHYUMas2323E4d57vfBfFSTRU@!DSH(*%FDSdfg13sgfsg";
 
@@ -53,6 +64,7 @@ public class createaccount extends AppCompatActivity {
 
         AddData();
 
+
         }
     public  void AddData() {
         createAccountbtn.setOnClickListener(
@@ -68,7 +80,27 @@ public class createaccount extends AppCompatActivity {
                         int size1 = firstname.length();
                         int size2 = lastname.length();
 
-                        if(size1 > 1 && size2 > 1 && passwordLength(passwordstring) == true && confirmpasswordstring.equals(passwordstring) && !email_address.getText().toString().equals("")) {
+                        if(size1 >1) {
+                            fname.getBackground().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+                        }
+                        if(size2>1) {
+                            lname.getBackground().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+                        }
+                        if(passwordLength(passwordstring) == true) {
+                            password.getBackground().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+
+                        }
+                        if(confirmpasswordstring.equals(passwordstring)) {
+                            conf_password.getBackground().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+
+                        }
+                        if(isValidEmailAddress(emailaddress) == true) {
+                            email_address.getBackground().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
+
+                        }
+
+                        if(size1 > 1 && size2 > 1 && passwordLength(passwordstring) == true && confirmpasswordstring.equals(passwordstring) && !email_address.getText().toString().equals("") && isValidEmailAddress(emailaddress) == true) {
+
 
                             firebaseAuth.createUserWithEmailAndPassword(email_address .getText().toString().trim(),
                                     password.getText().toString())
@@ -107,6 +139,7 @@ public class createaccount extends AppCompatActivity {
                                             }
 
                                             else {
+
                                                 Toast.makeText(createaccount.this, task.getException().getMessage(),
                                                         Toast.LENGTH_LONG).show();
                                             }
@@ -114,12 +147,49 @@ public class createaccount extends AppCompatActivity {
                                     });
                         }
                         else {
-                            Toast.makeText(createaccount.this, "Error in above input fields. Please correct them",
+                            if(email_address.getText().toString().equals("")) {
+                                email_address.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.SRC_ATOP);
+                            }
+                            if(size1 <=1) {
+                                fname.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.SRC_ATOP);
+                            }
+                            if(size2<=1) {
+                                lname.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.SRC_ATOP);
+                            }
+                            if(passwordLength(passwordstring) == false) {
+                                password.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.SRC_ATOP);
+
+                            }
+                            if(!confirmpasswordstring.equals(passwordstring)) {
+                                conf_password.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.SRC_ATOP);
+
+                            }
+                            if(isValidEmailAddress(emailaddress) == false) {
+                                email_address.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.SRC_ATOP);
+
+                            }
+                             Toast.makeText(createaccount.this, "Error in above input fields. Please correct them. Make sure password is min 8 characters long containing 5 digits",
                                     Toast.LENGTH_LONG).show();
                         }
                 }}
         );
     }
+
+    public  boolean isValidEmailAddress(String email) {
+        boolean result = true;
+        try {
+            InternetAddress emailAddr = new InternetAddress(email);
+            emailAddr.validate();
+        } catch (AddressException ex) {
+            result = false;
+        }
+        catch (Exception e) {
+            Toast.makeText(createaccount.this, e.toString(),
+                    Toast.LENGTH_LONG).show();
+        }
+        return result;
+    }
+
     public static String md5Hash(String message) {
         String md5 = "";
         if(null == message)
@@ -167,7 +237,7 @@ public class createaccount extends AppCompatActivity {
         } // End for loop
 
         /* Now check for the count of digits in the password */
-        if( digit < 6 ){
+        if( digit < 5 ){
             /* There are fewer than 2 digits in the password, return false */
             return false;
         }
@@ -182,6 +252,27 @@ public class createaccount extends AppCompatActivity {
         /* All checks at this point have passed, the password is valid */
         return correct;
 
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.speechrecognition_menu, menu);
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.menu_home:
+                if (SystemClock.elapsedRealtime() - mLastClickTime < 2000) {
+                    return false;
+                }
+                mLastClickTime = SystemClock.elapsedRealtime();
+                startActivity(new Intent(createaccount.this, loginscreen.class));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
 }

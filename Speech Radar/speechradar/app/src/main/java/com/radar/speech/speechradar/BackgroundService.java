@@ -2,9 +2,11 @@ package com.radar.speech.speechradar;
 
 import android.annotation.SuppressLint;
 import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -18,10 +20,16 @@ import android.widget.TextView;
 
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.afollestad.materialdialogs.Theme;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import me.toptas.fancyshowcase.FancyShowCaseView;
 
 public class BackgroundService extends loginscreen {
 
-    private Button btStartService;
 
     Bundle extras;
     public  String values;
@@ -29,43 +37,31 @@ public class BackgroundService extends loginscreen {
     TextView txt2;
     ImageView img;
     public static String values2;
+    public static int counter = 0;
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_background_service);
-        btStartService = (Button) findViewById(R.id.backgroundService);
-        txt = (TextView) findViewById(R.id.txt_content) ;
-        txt2 = (TextView) findViewById(R.id.txt_content2) ;
+        txt = (TextView) findViewById(R.id.title2);
+        txt2 = (TextView) findViewById(R.id.para);
         img = (ImageView) findViewById(R.id.screenshot1);
         extras = getIntent().getExtras();
         values = extras.getString("email_var2");
         values2 = values;
-
-        txt.startAnimation(AnimationUtils.loadAnimation(BackgroundService.this,android.R.anim.slide_in_left));
-        txt2.startAnimation(AnimationUtils.loadAnimation(BackgroundService.this,android.R.anim.slide_in_left));
-        img.startAnimation(AnimationUtils.loadAnimation(BackgroundService.this,android.R.anim.slide_in_left));
-        btStartService.startAnimation(AnimationUtils.loadAnimation(BackgroundService.this,android.R.anim.slide_in_left));
+        startService(new Intent(BackgroundService.this, MyService.class));
+        counter++;
+        txt.startAnimation(AnimationUtils.loadAnimation(BackgroundService.this, android.R.anim.slide_in_left));
+        txt2.startAnimation(AnimationUtils.loadAnimation(BackgroundService.this, android.R.anim.slide_in_left));
+        img.startAnimation(AnimationUtils.loadAnimation(BackgroundService.this, android.R.anim.slide_in_left));
 
         //Some devices will not allow background service to work, So we have to enable autoStart for the app.
         //As per now we are not having any way to check autoStart is enable or not,so better to give this in LoginArea,
         //so user will not get this popup again and again until he logout
         enableAutoStart();
 
-        if (checkServiceRunning()) {
-            btStartService.setText(getString(R.string.stop_service));
-        }
 
-        btStartService.setOnClickListener(v -> {
-
-            if (btStartService.getText().toString().equalsIgnoreCase(getString(R.string.start_service))) {
-                startService(new Intent(BackgroundService.this, MyService.class));
-                btStartService.setText(getString(R.string.stop_service));
-            } else {
-                stopService(new Intent(BackgroundService.this, MyService.class));
-                btStartService.setText(getString(R.string.start_service));
-            }
-        });
     }
+
 
     @Override
     protected void onDestroy() {
@@ -111,20 +107,8 @@ public class BackgroundService extends loginscreen {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.speechrecognition_menu, menu);
-        return true;
+    public void onBackPressed() {
+
     }
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
-        switch (item.getItemId()) {
-            case R.id.menu_home:
-                startActivity(new Intent(BackgroundService.this, loginscreen.class));
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
+
 }

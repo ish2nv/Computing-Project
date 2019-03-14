@@ -8,14 +8,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.IBinder;
 import android.provider.Settings;
-import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
@@ -37,9 +33,17 @@ public class MyService extends Service implements SpeechDelegate, Speech.stopDue
     private MediaPlayer player;
     private AudioManager mAudioManager;
 
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        //TODO do something useful
+        try {
+            if (VERSION.SDK_INT >= VERSION_CODES.KITKAT) {
+                ((AudioManager) Objects.requireNonNull(
+                        getSystemService(Context.AUDIO_SERVICE))).setStreamMute(AudioManager.STREAM_SYSTEM, true);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         Speech.init(this);
         delegate = this;
@@ -47,13 +51,14 @@ public class MyService extends Service implements SpeechDelegate, Speech.stopDue
 
         if (Speech.getInstance().isListening()) {
             Speech.getInstance().stopListening();
+            muteBeepSoundOfRecorder();
         } else {
             System.setProperty("rx.unsafe-disable", "True");
             RxPermissions.getInstance(this).request(permission.RECORD_AUDIO).subscribe(granted -> {
                 if (granted) { // Always true pre-M
                     try {
                         Speech.getInstance().stopTextToSpeech();
-                        Speech.getInstance().startListening(null, this);
+                        Speech.getInstance().start(null, this);
                     } catch (SpeechRecognitionNotAvailable exc) {
                         //showSpeechNotSupportedDialog();
 
@@ -64,6 +69,7 @@ public class MyService extends Service implements SpeechDelegate, Speech.stopDue
                     Toast.makeText(this, R.string.permission_required, Toast.LENGTH_LONG).show();
                 }
             });
+            muteBeepSoundOfRecorder();
         }
         return Service.START_STICKY;
     }
@@ -88,44 +94,77 @@ public class MyService extends Service implements SpeechDelegate, Speech.stopDue
         for (String partial : results) {
             Log.d("Result", partial+"");
         }
+
     }
 
     @Override
     public void onSpeechResult(String result) {
-
-      String val = BackgroundService.values2;
-      System.out.println("the codeWord is: " + val);
+        String arr[] = result.split(" ", 2);
+        String val = BackgroundService.values2;
+        System.out.println("the codeWord is: " + val);
         ArrayList<String> a = new ArrayList<String>();
-        Log.d("Result", result+"");
-        if (!TextUtils.isEmpty(result)) {
-            Toast.makeText(this, result, Toast.LENGTH_SHORT).show();
-
+        Log.d("Result", arr[0] + "");
+        if (!TextUtils.isEmpty(arr[0])) {
+            Toast.makeText(this, arr[0], Toast.LENGTH_SHORT).show();
         }
-        if(result.equals(val)) {
-            a.add(result);
-        }
-        if(a.get(0).equals(val)) {
-            muteBeepSoundOfRecorders();
-            player = MediaPlayer.create(this,
-                    Settings.System.DEFAULT_RINGTONE_URI);
-            player.setLooping(true);
-            player.start();
+        if(a.size() < 2) {
+            if (val.equals("Sheila")) {
+                if (arr[0].equals("cheetah") || arr[0].equals("tschida")) {
+                    a.add(arr[0]);
+                    if (a.get(0).equals("cheetah") || arr[0].equals("tschida")) {
+                        muteBeepSoundOfRecorder();
+                        player = MediaPlayer.create(this,
+                                Settings.System.DEFAULT_RINGTONE_URI);
+                        player.setLooping(true);
+                        player.start();
 
-        }
+                    }
+                }
+            }
+            if (val.equals("backward")) {
+                if (arr[0].equals("backwood")) {
+                    a.add(arr[0]);
 
+                    if (a.get(0).equals("backwood")) {
+                        muteBeepSoundOfRecorder();
+                        player = MediaPlayer.create(this,
+                                Settings.System.DEFAULT_RINGTONE_URI);
+                        player.setLooping(true);
+                        player.start();
+                    }
+                } }
+            if (arr[0].equals(val)) {
+                a.add(arr[0]);
+            }
+            if (a.get(0).equals(val)) {
+                muteBeepSoundOfRecorder();
+                player = MediaPlayer.create(this,
+                        Settings.System.DEFAULT_RINGTONE_URI);
+                player.setLooping(true);
+                player.start();
+
+            } }
     }
 
     @Override
     public void onSpecifiedCommandPronounced(String event) {
-
+        try {
+            if (VERSION.SDK_INT >= VERSION_CODES.KITKAT) {
+                ((AudioManager) Objects.requireNonNull(
+                        getSystemService(Context.AUDIO_SERVICE))).setStreamMute(AudioManager.STREAM_SYSTEM, true);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         if (Speech.getInstance().isListening()) {
+            muteBeepSoundOfRecorder();
             Speech.getInstance().stopListening();
         } else {
             RxPermissions.getInstance(this).request(permission.RECORD_AUDIO).subscribe(granted -> {
                 if (granted) { // Always true pre-M
                     try {
                         Speech.getInstance().stopTextToSpeech();
-                        Speech.getInstance().startListening(null, this);
+                        Speech.getInstance().start(null, this);
                     } catch (SpeechRecognitionNotAvailable exc) {
                         //showSpeechNotSupportedDialog();
 
@@ -136,17 +175,18 @@ public class MyService extends Service implements SpeechDelegate, Speech.stopDue
                     Toast.makeText(this, R.string.permission_required, Toast.LENGTH_LONG).show();
                 }
             });
+            muteBeepSoundOfRecorder();
         }
     }
 
     /**
      * Function to remove the beep sound of voice recognizer.
      */
-    private void muteBeepSoundOfRecorders() {
+    private void muteBeepSoundOfRecorder() {
         AudioManager amanager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         if (amanager != null) {
             int maxVolume = amanager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-            float percent = 0.9f;
+            float percent = 0.8f;
             int seventyVolume = (int) (maxVolume*percent);
             amanager.setStreamVolume(AudioManager.STREAM_MUSIC, seventyVolume, 0);
         }

@@ -11,6 +11,7 @@
         android:id="@+id/menu_home"
         android:title="Log out"
         app:showAsAction="always"
-        android:icon="@mipmap/logout" />
+        android:icon="@drawable/logout" />
+
 
 </menu>

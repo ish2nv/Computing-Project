@@ -1,9 +1,14 @@
 package com.radar.speech.speechradar;
 
+import android.content.Intent;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
@@ -17,6 +22,7 @@ import com.google.firebase.auth.FirebaseAuth;
 public class forgotPassword extends AppCompatActivity {
     Button resetpass;
     EditText email;
+    private long mLastClickTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,23 +41,53 @@ public class forgotPassword extends AppCompatActivity {
         resetpass.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                FirebaseAuth.getInstance().sendPasswordResetEmail(email .getText().toString().trim())
-                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                if (task.isSuccessful()) {
-                                    Toast.makeText(forgotPassword.this, "Reset password sent to " + email.getText().toString(),
-                                            Toast.LENGTH_LONG).show();}
-                               else {
-                                    Toast.makeText(forgotPassword.this, "Email does not exist! please try another email",
-                                            Toast.LENGTH_LONG).show();
+                try {
+                    FirebaseAuth.getInstance().sendPasswordResetEmail(email.getText().toString().trim())
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+
+                                    if (task.isSuccessful()) {
+                                        Toast.makeText(forgotPassword.this, "Reset password sent to " + email.getText().toString(),
+                                                Toast.LENGTH_LONG).show();
+                                    } else {
+                                        Toast.makeText(forgotPassword.this, "Email does not exist! please try another email",
+                                                Toast.LENGTH_LONG).show();
+                                    }
+
                                 }
-                            }
-                        });
+                            });
                 }
+                catch(Exception e){
+                    Toast.makeText(forgotPassword.this, e.toString(),
+                            Toast.LENGTH_LONG).show();
+                }
+
+            }
 
 
         }
         );
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.speechrecognition_menu, menu);
+        return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.menu_home:
+                if (SystemClock.elapsedRealtime() - mLastClickTime < 2000) {
+                    return false;
+                }
+                mLastClickTime = SystemClock.elapsedRealtime();
+                startActivity(new Intent(forgotPassword.this, loginscreen.class));
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }
