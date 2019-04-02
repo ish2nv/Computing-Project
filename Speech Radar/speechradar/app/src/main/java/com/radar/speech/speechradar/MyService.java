@@ -7,11 +7,12 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
-import android.media.MediaPlayer;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Build.VERSION;
 import android.os.Build.VERSION_CODES;
 import android.os.IBinder;
-import android.provider.Settings;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
@@ -30,9 +31,7 @@ import java.util.Random;
 public class MyService extends Service implements SpeechDelegate, Speech.stopDueToDelay {
 
     public static SpeechDelegate delegate;
-    private MediaPlayer player;
-    private AudioManager mAudioManager;
-
+    private Context mContext;
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         //TODO do something useful
@@ -58,7 +57,7 @@ public class MyService extends Service implements SpeechDelegate, Speech.stopDue
                 if (granted) { // Always true pre-M
                     try {
                         Speech.getInstance().stopTextToSpeech();
-                        Speech.getInstance().start(null, this);
+                        Speech.getInstance().startListening(null, this);
                     } catch (SpeechRecognitionNotAvailable exc) {
                         //showSpeechNotSupportedDialog();
 
@@ -94,11 +93,11 @@ public class MyService extends Service implements SpeechDelegate, Speech.stopDue
         for (String partial : results) {
             Log.d("Result", partial+"");
         }
-
     }
 
     @Override
     public void onSpeechResult(String result) {
+        mContext = getApplicationContext();
         String arr[] = result.split(" ", 2);
         String val = BackgroundService.values2;
         System.out.println("the codeWord is: " + val);
@@ -113,10 +112,9 @@ public class MyService extends Service implements SpeechDelegate, Speech.stopDue
                     a.add(arr[0]);
                     if (a.get(0).equals("cheetah") || arr[0].equals("tschida")) {
                         muteBeepSoundOfRecorder();
-                        player = MediaPlayer.create(this,
-                                Settings.System.DEFAULT_RINGTONE_URI);
-                        player.setLooping(true);
-                        player.start();
+                        Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+                        Ringtone ringtone = RingtoneManager.getRingtone(mContext,uri);
+                        ringtone.play();
 
                     }
                 }
@@ -127,10 +125,9 @@ public class MyService extends Service implements SpeechDelegate, Speech.stopDue
 
                     if (a.get(0).equals("backwood")) {
                         muteBeepSoundOfRecorder();
-                        player = MediaPlayer.create(this,
-                                Settings.System.DEFAULT_RINGTONE_URI);
-                        player.setLooping(true);
-                        player.start();
+                        Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+                        Ringtone ringtone = RingtoneManager.getRingtone(mContext,uri);
+                        ringtone.play();
                     }
                 } }
             if (arr[0].equals(val)) {
@@ -138,10 +135,9 @@ public class MyService extends Service implements SpeechDelegate, Speech.stopDue
             }
             if (a.get(0).equals(val)) {
                 muteBeepSoundOfRecorder();
-                player = MediaPlayer.create(this,
-                        Settings.System.DEFAULT_RINGTONE_URI);
-                player.setLooping(true);
-                player.start();
+                Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+                Ringtone ringtone = RingtoneManager.getRingtone(mContext,uri);
+                ringtone.play();
 
             } }
     }
@@ -151,7 +147,8 @@ public class MyService extends Service implements SpeechDelegate, Speech.stopDue
         try {
             if (VERSION.SDK_INT >= VERSION_CODES.KITKAT) {
                 ((AudioManager) Objects.requireNonNull(
-                        getSystemService(Context.AUDIO_SERVICE))).setStreamMute(AudioManager.STREAM_SYSTEM, true);
+                        getSystemService(Context.AUDIO_SERVICE))).setStreamMute(AudioManager.STREAM_SYSTEM,
+                        true);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -164,7 +161,7 @@ public class MyService extends Service implements SpeechDelegate, Speech.stopDue
                 if (granted) { // Always true pre-M
                     try {
                         Speech.getInstance().stopTextToSpeech();
-                        Speech.getInstance().start(null, this);
+                        Speech.getInstance().startListening(null, this);
                     } catch (SpeechRecognitionNotAvailable exc) {
                         //showSpeechNotSupportedDialog();
 
@@ -185,10 +182,14 @@ public class MyService extends Service implements SpeechDelegate, Speech.stopDue
     private void muteBeepSoundOfRecorder() {
         AudioManager amanager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         if (amanager != null) {
-            int maxVolume = amanager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-            float percent = 0.8f;
-            int seventyVolume = (int) (maxVolume*percent);
-            amanager.setStreamVolume(AudioManager.STREAM_MUSIC, seventyVolume, 0);
+            amanager.setStreamMute(AudioManager.STREAM_NOTIFICATION, true);
+            amanager.setStreamMute(AudioManager.STREAM_ALARM, true);
+            amanager.setStreamMute(AudioManager.STREAM_MUSIC, true);
+            amanager.setStreamMute(AudioManager.STREAM_SYSTEM, true);
+            int maxVolume = amanager.getStreamMaxVolume(AudioManager.STREAM_RING);
+            float percent = 0.1f;
+            int seventyVolume = (int) (maxVolume * percent);
+            amanager.setStreamVolume(AudioManager.STREAM_RING, seventyVolume, 0);
         }
     }
 

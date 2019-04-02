@@ -4,15 +4,18 @@ android {
     packagingOptions {
         pickFirst 'META-INF/LICENSE.txt' // picks the JavaMail license file
     }
-    compileSdkVersion 27
+    compileSdkVersion 25
+    buildToolsVersion '27.0.3'
     defaultConfig {
         applicationId "com.radar.speech.speechradar"
-        minSdkVersion 17
-        targetSdkVersion 27
+        minSdkVersion 16
+        targetSdkVersion 25
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
     }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -42,6 +45,7 @@ dependencies {
     implementation 'org.tensorflow:tensorflow-android:1.10.0'
     implementation 'com.sun.mail:android-mail:1.6.2'
     implementation 'com.sun.mail:android-activation:1.6.2'
+
 
     implementation project(path: ':speech')
 }

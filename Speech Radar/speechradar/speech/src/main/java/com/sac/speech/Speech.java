@@ -348,7 +348,7 @@ public class Speech {
      */
     public void startListening(final SpeechDelegate delegate)
             throws SpeechRecognitionNotAvailable, GoogleVoiceTypingDisabledException {
-        start(null, delegate);
+        startListening(null, delegate);
     }
 
     /**
@@ -359,7 +359,7 @@ public class Speech {
      * @throws SpeechRecognitionNotAvailable      when speech recognition is not available on the device
      * @throws GoogleVoiceTypingDisabledException when google voice typing is disabled on the device
      */
-    public void start(final SpeechProgressView progressView, final SpeechDelegate delegate)
+    public void startListening(final SpeechProgressView progressView, final SpeechDelegate delegate)
             throws SpeechRecognitionNotAvailable, GoogleVoiceTypingDisabledException {
         if (mIsListening) return;
 

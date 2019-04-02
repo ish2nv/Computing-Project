@@ -2,6 +2,7 @@ package com.radar.speech.speechradar;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.media.AudioFormat;
@@ -220,6 +221,12 @@ public class speechrecognition extends loginscreen {
         adapter.notifyDataSetChanged();
         speechrecognition.setListViewHeightBasedOnItems(list);
 
+        Typeface custom_font = Typeface.createFromAsset(getAssets(),  "fonts/chewy.ttf");
+
+        maintitle.setTypeface(custom_font);
+        subtitle.setTypeface(custom_font);
+        taptospeak.setTypeface(custom_font);
+        ourtext.setTypeface(custom_font);
 
         if(BackgroundService.counter > 0) {
             speechrecognitionmic.setEnabled(false);

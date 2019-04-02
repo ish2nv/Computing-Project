@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -54,6 +55,9 @@ public class BackgroundService extends loginscreen {
         txt2.startAnimation(AnimationUtils.loadAnimation(BackgroundService.this, android.R.anim.slide_in_left));
         img.startAnimation(AnimationUtils.loadAnimation(BackgroundService.this, android.R.anim.slide_in_left));
 
+        Typeface custom_font = Typeface.createFromAsset(getAssets(),  "fonts/chewy.ttf");
+
+        txt.setTypeface(custom_font);
         //Some devices will not allow background service to work, So we have to enable autoStart for the app.
         //As per now we are not having any way to check autoStart is enable or not,so better to give this in LoginArea,
         //so user will not get this popup again and again until he logout

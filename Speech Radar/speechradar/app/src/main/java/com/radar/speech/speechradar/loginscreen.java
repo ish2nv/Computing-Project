@@ -2,6 +2,7 @@ package com.radar.speech.speechradar;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresPermission;
@@ -67,6 +68,10 @@ public class loginscreen extends AppCompatActivity {
         userPass.startAnimation(AnimationUtils.loadAnimation(loginscreen.this,android.R.anim.slide_in_left));
         maintitle2.startAnimation(AnimationUtils.loadAnimation(loginscreen.this,android.R.anim.slide_in_left));
 
+
+        Typeface custom_font = Typeface.createFromAsset(getAssets(),  "fonts/chewy.ttf");
+
+        maintitle2.setTypeface(custom_font);
 
         createAccountLink.setOnClickListener(new View.OnClickListener() {
             @Override
