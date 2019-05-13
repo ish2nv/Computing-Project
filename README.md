@@ -8,7 +8,7 @@ Speech Radar is an Android application that allows users to locate their phone t
 
 # Navigation
 
-Below, you can nagivate to all areas of interest. The implementation for TensorFlow was taken from <a href = "https://github.com/tensorflow/tensorflow/tree/master/tensorflow/examples/speech_commands"></a>
+Below, you can nagivate to all areas of interest. The implementation for TensorFlow was taken from <a href = "https://github.com/tensorflow/tensorflow/tree/master/tensorflow/examples/speech_commands">this open-source repository.</a>
 
 <ul>
   <li><a href="#home">Android Studio</a></li>
