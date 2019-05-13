@@ -12,7 +12,7 @@ Below, you can nagivate to all areas of interest.
 
 <ul>
   <li><a href="https://github.com/ish2nv/Computing-Project/tree/master/Speech%20Radar/speechradar">Android Studio implementation</a></li>
-  <li><a href="#news">APK file</a></li>
+  <li><a href="https://github.com/ish2nv/Computing-Project/tree/master/Unreleased%20apk">APK file</a></li>
   <li><a href="https://github.com/ish2nv/Computing-Project/tree/master/Final%20Report">Final Report</a></li>
 </ul>
 
