@@ -21,11 +21,9 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 
@@ -35,10 +33,14 @@ public class createaccount extends AppCompatActivity {
     FirebaseAuth firebaseAuth;
     DatabaseReference myRef;
     private long mLastClickTime;
+    DBHelper myDb;
+    public static final String TABLE_NAME = "recovery_account_table";
+
+
+
 
     private final static String salt="DGE$5SGr@3VsHYUMas2323E4d57vfBfFSTRU@!DSH(*%FDSdfg13sgfsg";
 
-    private static final int PER_LOGIN = 1000;
     @Override
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,26 +48,28 @@ public class createaccount extends AppCompatActivity {
         setContentView(R.layout.activity_createaccount);
         myRef = FirebaseDatabase.getInstance().getReference();
 
-        createAccountbtn = (Button)findViewById(R.id.create_account_btn);
-        fname = (EditText)findViewById(R.id.fname);
-        lname = (EditText)findViewById(R.id.lname);
-        password = (EditText)findViewById(R.id.password);
-        conf_password = (EditText)findViewById(R.id.conf_password);
-        email_address = (EditText)findViewById(R.id.email_address);
+        createAccountbtn = (Button) findViewById(R.id.create_account_btn);
+        fname = (EditText) findViewById(R.id.fname);
+        lname = (EditText) findViewById(R.id.lname);
+        password = (EditText) findViewById(R.id.password);
+        conf_password = (EditText) findViewById(R.id.conf_password);
+        email_address = (EditText) findViewById(R.id.email_address);
+
+        myDb = new DBHelper(this);
+
         firebaseAuth = FirebaseAuth.getInstance();
 
-        fname.startAnimation(AnimationUtils.loadAnimation(createaccount.this,android.R.anim.slide_in_left));
-        lname.startAnimation(AnimationUtils.loadAnimation(createaccount.this,android.R.anim.slide_in_left));
-        password.startAnimation(AnimationUtils.loadAnimation(createaccount.this,android.R.anim.slide_in_left));
-        conf_password.startAnimation(AnimationUtils.loadAnimation(createaccount.this,android.R.anim.slide_in_left));
-        email_address.startAnimation(AnimationUtils.loadAnimation(createaccount.this,android.R.anim.slide_in_left));
-        createAccountbtn.startAnimation(AnimationUtils.loadAnimation(createaccount.this,android.R.anim.slide_in_left));
+        fname.startAnimation(AnimationUtils.loadAnimation(createaccount.this, android.R.anim.slide_in_left));
+        lname.startAnimation(AnimationUtils.loadAnimation(createaccount.this, android.R.anim.slide_in_left));
+        password.startAnimation(AnimationUtils.loadAnimation(createaccount.this, android.R.anim.slide_in_left));
+        conf_password.startAnimation(AnimationUtils.loadAnimation(createaccount.this, android.R.anim.slide_in_left));
+        email_address.startAnimation(AnimationUtils.loadAnimation(createaccount.this, android.R.anim.slide_in_left));
+        createAccountbtn.startAnimation(AnimationUtils.loadAnimation(createaccount.this, android.R.anim.slide_in_left));
+
+                AddData();
 
 
-        AddData();
-
-
-        }
+    }
     public  void AddData() {
         createAccountbtn.setOnClickListener(
                 new View.OnClickListener() {
@@ -79,27 +83,23 @@ public class createaccount extends AppCompatActivity {
                         final String emailaddress = email_address.getText().toString();
                         int size1 = firstname.length();
                         int size2 = lastname.length();
-
                         if(size1 >1) {
                             fname.getBackground().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
                         }
                         if(size2>1) {
                             lname.getBackground().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
                         }
-                        if(passwordLength(passwordstring) == true) {
+                        if(passwordRules(passwordstring) == true) {
                             password.getBackground().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
-
                         }
                         if(confirmpasswordstring.equals(passwordstring)) {
                             conf_password.getBackground().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
-
                         }
                         if(isValidEmailAddress(emailaddress) == true) {
                             email_address.getBackground().setColorFilter(Color.WHITE, PorterDuff.Mode.SRC_ATOP);
-
                         }
 
-                        if(size1 > 1 && size2 > 1 && passwordLength(passwordstring) == true && confirmpasswordstring.equals(passwordstring) && !email_address.getText().toString().equals("") && isValidEmailAddress(emailaddress) == true) {
+                        if(size1 > 1 && size2 > 1 && passwordRules(passwordstring) == true && confirmpasswordstring.equals(passwordstring) && !email_address.getText().toString().equals("") && isValidEmailAddress(emailaddress) == true) {
 
 
                             firebaseAuth.createUserWithEmailAndPassword(email_address .getText().toString().trim(),
@@ -120,12 +120,13 @@ public class createaccount extends AppCompatActivity {
                                                                     Toast.makeText(createaccount.this, "Registered successfully. Please check your email for verification",
                                                                             Toast.LENGTH_LONG).show();
                                                                     String id = myRef.push().getKey();
-                                                                    String hashpassword = md5Hash(passwordstring);
-                                                                    String hashconfpassword = md5Hash(confirmpasswordstring);
+                                                                    String hashpassword = Hash(passwordstring);
+                                                                    String hashconfpassword = Hash(confirmpasswordstring);
                                                                     String emailaddress2 = emailaddress.replace(".", "");
                                                                     emailaddress2 = emailaddress2.replace(" ","");
                                                                     Account account = new Account(id,firstname,lastname,hashpassword,hashconfpassword,emailaddress);
                                                                     myRef.child(emailaddress2).setValue(account);
+                                                                    myDb.insert_to_DB(fname.getText().toString(), lname.getText().toString(), hashpassword,hashconfpassword,email_address.getText().toString(),"yes" );
 
 
 
@@ -156,7 +157,7 @@ public class createaccount extends AppCompatActivity {
                             if(size2<=1) {
                                 lname.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.SRC_ATOP);
                             }
-                            if(passwordLength(passwordstring) == false) {
+                            if(passwordRules(passwordstring) == false) {
                                 password.getBackground().setColorFilter(Color.RED, PorterDuff.Mode.SRC_ATOP);
 
                             }
@@ -175,11 +176,11 @@ public class createaccount extends AppCompatActivity {
         );
     }
 
-    public  boolean isValidEmailAddress(String email) {
+    public boolean isValidEmailAddress(String emailaddress) {
         boolean result = true;
         try {
-            InternetAddress emailAddr = new InternetAddress(email);
-            emailAddr.validate();
+            InternetAddress emailAddress = new InternetAddress(emailaddress);
+            emailAddress.validate();
         } catch (AddressException ex) {
             result = false;
         }
@@ -190,16 +191,16 @@ public class createaccount extends AppCompatActivity {
         return result;
     }
 
-    public static String md5Hash(String message) {
+    public static String Hash(String message) {
         String md5 = "";
         if(null == message)
             return null;
 
-        message = message+salt;//adding a salt to the string before it gets hashed.
+        message = message+salt;
         try {
-            MessageDigest digest = MessageDigest.getInstance("MD5");//Create MessageDigest object for MD5
-            digest.update(message.getBytes(), 0, message.length());//Update input string in message digest
-            md5 = new BigInteger(1, digest.digest()).toString(16);//Converts message digest value in base 16 (hex)
+            MessageDigest digest = MessageDigest.getInstance("MD5");
+            digest.update(message.getBytes(), 0, message.length());
+            md5 = new BigInteger(1, digest.digest()).toString(16);
 
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
@@ -207,50 +208,36 @@ public class createaccount extends AppCompatActivity {
         return md5;
     }
 
-    public static boolean passwordLength(String password) {
-        /* Declare a boolean variable to hold the result of the method */
-        boolean correct = true;
+    public static boolean passwordRules(String password) {
+        boolean c = true;
 
-        /* Declare an int variable to hold the count of each digit */
-        int digit = 0;
+        int number = 0;
 
         if (password.length() < 8) {
-            /* The password is less than 8 characters, return false */
             return false;
         }
 
-        /* Declare a char variable to hold each element of the String */
-        char element;
+        char elem;
 
-        /* Check if the password has 2 or more digits */
-        for(int index = 0; index < password.length(); index++ ){
+        for(int i = 0; i < password.length(); i++ ){
 
-            /* Check each char in the String */
-            element = password.charAt( index );
+            elem = password.charAt( i );
 
-            /* Check if it is a digit or not */
-            if( Character.isDigit(element) ){
-                /* It is a digit, so increment digit */
-                digit++;
-            } // End if block
+            if( Character.isDigit(elem) ){
+                number++;
+            }
 
-        } // End for loop
+        }
 
-        /* Now check for the count of digits in the password */
-        if( digit < 5 ){
-            /* There are fewer than 2 digits in the password, return false */
+        if( number < 5 ){
             return false;
         }
 
-        /* Use a regular expression (regex) to check for only letters and numbers */
-        /* The regex will check for upper and lower case letters and digits */
         if( !password.matches("[a-zA-Z0-9]+") ){
-            /* A non-alphanumeric character was found, return false */
             return false;
         }
 
-        /* All checks at this point have passed, the password is valid */
-        return correct;
+        return c;
 
     }
     @Override
@@ -261,7 +248,6 @@ public class createaccount extends AppCompatActivity {
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
         switch (item.getItemId()) {
             case R.id.menu_home:
                 if (SystemClock.elapsedRealtime() - mLastClickTime < 2000) {

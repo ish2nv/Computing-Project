@@ -1,10 +1,12 @@
 package com.radar.speech.speechradar;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.GradientDrawable;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioRecord;
@@ -60,6 +62,7 @@ public class speechrecognition extends loginscreen {
     private ArrayAdapter<String> adapter;
     private ArrayList<String> arrayList;
     private long mLastClickTime;
+    DBHelper myDb;
 
     public static String firstWord;
     EditText userEmail;
@@ -75,7 +78,13 @@ public class speechrecognition extends loginscreen {
     CountDownTimer mCountDownTimer;
     CountDownTimer mCountDownTimer2;
     CountDownTimer mCountDownTimer3;
-
+    public static final String COL_1 = "ID";
+    public static final String COL_2 = "FIRSTNAME";
+    public static final String COL_3 = "LASTNAME";
+    public static final String COL_4 = "PASSWORD";
+    public static final String COL_5 = "CONFIRM_PASSWORD";
+    public static final String COL_6 = "EMAIL_ADDRESS";
+    public static final String COL_7 = "CODEWORD";
     TextView subtitle;
 
     int i=0;
@@ -95,6 +104,7 @@ public class speechrecognition extends loginscreen {
     private static final String INPUT_DATA_NAME = "decoded_sample_data:0";
     private static final String SAMPLE_RATE_NAME = "decoded_sample_data:1";
     private static final String OUTPUT_SCORES_NAME = "labels_softmax";
+    public static final String TABLE_NAME = "recovery_account_table";
 
     // UI elements.
     private static final int REQUEST_RECORD_AUDIO = 13;
@@ -110,9 +120,7 @@ public class speechrecognition extends loginscreen {
     private TensorFlowInferenceInterface inferenceInterface;
     private List<String> labels = new ArrayList<String>();
     private List<String> displayedLabels = new ArrayList<>();
-    private RecognizeCommands recognizeCommands = null;
-
-
+    private Recognize recognize = null;
 
 
 
@@ -141,6 +149,7 @@ public class speechrecognition extends loginscreen {
         subtitle.startAnimation(AnimationUtils.loadAnimation(speechrecognition.this,android.R.anim.slide_in_left));
         saveCodeWordinDB.startAnimation(AnimationUtils.loadAnimation(speechrecognition.this,android.R.anim.slide_in_left));
         saving.setVisibility(View.INVISIBLE);
+        myDb = new DBHelper(this);
 
         try {
             Bundle extras = getIntent().getExtras();
@@ -186,8 +195,8 @@ public class speechrecognition extends loginscreen {
                 // Initialize a TextView for ListView each Item
                 TextView tv = (TextView) view.findViewById(android.R.id.text1);
 
-                tv.setHeight(85);
-                tv.setMinimumHeight(85);
+                tv.setHeight(90);
+                tv.setMinimumHeight(90);
                 // Set the text color of TextView (ListView Item)
                 tv.setTextColor(Color.WHITE);
 
@@ -199,24 +208,24 @@ public class speechrecognition extends loginscreen {
         list.setAdapter(adapter);
         speechrecognition.setListViewHeightBasedOnItems(list);
 
-        arrayList.add("yes");
-        arrayList.add("zero");
-        arrayList.add("stop");
-        arrayList.add("learn");
-        arrayList.add("happy");
-        arrayList.add("house");
-        arrayList.add("sheila");
-        arrayList.add("six");
-        arrayList.add("three");
-        arrayList.add("tree");
-        arrayList.add("visual");
-        arrayList.add("marvin");
-        arrayList.add("up");
-        arrayList.add("down");
-        arrayList.add("left");
-        arrayList.add("right");
-        arrayList.add("backward");
-        arrayList.add("forward");
+        arrayList.add("Yes");
+        arrayList.add("Zero");
+        arrayList.add("Stop");
+        arrayList.add("Learn");
+        arrayList.add("Happy");
+        arrayList.add("House");
+        arrayList.add("Sheila");
+        arrayList.add("Six");
+        arrayList.add("Three");
+        arrayList.add("Tree");
+        arrayList.add("Visual");
+        arrayList.add("Marvin");
+        arrayList.add("Up");
+        arrayList.add("Down");
+        arrayList.add("Left");
+        arrayList.add("Right");
+        arrayList.add("Backward");
+        arrayList.add("Forward");
 
         adapter.notifyDataSetChanged();
         speechrecognition.setListViewHeightBasedOnItems(list);
@@ -308,6 +317,7 @@ public class speechrecognition extends loginscreen {
                                 displayedLabels.add(line.substring(0, 1).toUpperCase() + line.substring(1));
                             }
                         }
+
                         br.close();
                     } catch (IOException e) {
                         throw new RuntimeException("Problem reading label file!", e);
@@ -315,8 +325,8 @@ public class speechrecognition extends loginscreen {
 
 
                     // Set up an object to smooth recognition results to increase accuracy.
-                    recognizeCommands =
-                            new RecognizeCommands(
+                    recognize =
+                            new Recognize(
                                     labels,
                                     AVERAGE_WINDOW_DURATION_MS,
                                     DETECTION_THRESHOLD,
@@ -337,8 +347,6 @@ public class speechrecognition extends loginscreen {
                         @Override
                         public void onTick(long millisUntilFinished) {
                             i2++;
-                            System.out.println(i2);
-                            System.out.println("millisUntilFinished: " + millisUntilFinished);
                             int a = (int) (millisUntilFinished/1000);
                             String g = String.valueOf(a) + " sec";
                             taptospeak.setText(g);
@@ -406,6 +414,24 @@ public class speechrecognition extends loginscreen {
                             Bundle extras = getIntent().getExtras();
                             String value = extras.getString("email_var");
                             mDatabaseRef.child(value).child("codeWord").setValue(firstWord);
+                            Bundle extras2 = getIntent().getExtras();
+                            String value2 = extras2.getString("emailwithstop");
+
+                            String values3 = value2.toString();
+                            String codeword = firstWord.toString();
+
+
+                            SQLiteDatabase db = myDb.getWritableDatabase();
+                            String query = "select * from "+TABLE_NAME+ " where EMAIL_ADDRESS = ?";
+                            Cursor gh = db.rawQuery(query,new String[]{values3});
+
+                            while(gh.moveToNext()) {
+
+                                myDb.updateDB(gh.getString(0),gh.getString(1),gh.getString(2),gh.getString(3),gh.getString(4),gh.getString(5),codeword);
+
+                            }
+
+
                             Intent i = new Intent(speechrecognition.this, BackgroundService.class);
                             i.putExtra("email_var2", firstWord);
                             i.putExtra("email_var4", value);
@@ -622,7 +648,7 @@ public class speechrecognition extends loginscreen {
 
             // Use the smoother to figure out if we've had a real recognition event.
             long currentTime = System.currentTimeMillis();
-            final RecognizeCommands.RecognitionResult result = recognizeCommands.processLatestResults(outputScores, currentTime);
+            final Recognize.RecognitionResult result = recognize.processLatestResults(outputScores, currentTime);
 
             runOnUiThread(
                     new Runnable() {
@@ -636,6 +662,7 @@ public class speechrecognition extends loginscreen {
                                         labelIndex = i;
                                     }
                                 }
+
                                 ourtext.setText("Code Word: " + result.foundCommand);
                                 firstWord = result.foundCommand;
                             }
@@ -648,6 +675,10 @@ public class speechrecognition extends loginscreen {
                 // Ignore
             }
         }
+
+    }
+    @Override
+    public void onBackPressed() {
 
     }
 

@@ -1,55 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.radar.speech.speechradar">
-<supports-screens
-    android:largeScreens="true"
-    android:normalScreens="true"
-    android:smallScreens="true"
-    android:xlargeScreens="true"></supports-screens>
+
+    <supports-screens
+        android:largeScreens="true"
+        android:normalScreens="true"
+        android:smallScreens="true"
+        android:xlargeScreens="true" />
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
+
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
-        android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:icon="@mipmap/app_icon"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/app_icon_round"
+        android:supportsRtl="true">
+
         <activity
-            android:name=".loginscreen"
+            android:name=".SplashScreen"
             android:screenOrientation="portrait"
-            android:label="@string/login_screen_actionbar_title">
-            <intent-filter>
+            android:noHistory="true"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter android:label="@string/app_name">
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".loginscreen"
+            android:label="@string/loginscreen_actionbar_title"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme"></activity>
+
         <activity
             android:name=".createaccount"
+            android:label="@string/createaccount_actionbar_title"
             android:screenOrientation="portrait"
-            android:label="@string/createaccount_actionbar_title" />
+            android:theme="@style/AppTheme" />
+
         <activity
             android:name=".speechrecognition"
-            android:screenOrientation="portrait"
             android:label="@string/speechrecognition_actionbar_title"
-            android:noHistory="true" />
+            android:noHistory="true"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme" />
+
         <activity
             android:name=".forgotPassword"
+            android:label="@string/forgotPassword_actionbar_title"
             android:screenOrientation="portrait"
-            android:label="@string/forgotPassword_actionbar_title" />
+            android:theme="@style/AppTheme" />
 
         <service
-            android:name=".MyService"
-            android:screenOrientation="portrait"
-            android:enabled="true" />
+            android:name=".continuousService"
+            android:enabled="true"
+            android:stopWithTask="true" />
 
         <activity
             android:name=".BackgroundService"
+            android:label="@string/BackgroundService_actionbar_title"
             android:screenOrientation="portrait"
-            android:label="@string/BackgroundService_actionbar_title" />
+            android:theme="@style/AppTheme" />
+
     </application>
 
 </manifest>

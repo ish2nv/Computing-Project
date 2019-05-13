@@ -1,38 +1,24 @@
 package com.radar.speech.speechradar;
 
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.SystemClock;
 import android.support.annotation.NonNull;
-import android.support.annotation.RequiresPermission;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.Gravity;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 
 public class loginscreen extends AppCompatActivity {
@@ -45,8 +31,6 @@ public class loginscreen extends AppCompatActivity {
     TextView forgotpassword;
     TextView maintitle2;
     private long mLastClickTime;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,16 +78,28 @@ public class loginscreen extends AppCompatActivity {
             }
         });
 
+        SharedPreferences prefs = getSharedPreferences("UserData", MODE_PRIVATE);
+        String username = prefs.getString("emailaddress","");
+        String password = prefs.getString("pword","");
 
-        adddata();
+        userEmail.setText(username);
+        userPass.setText(password);
+
+        check();
 
     }
 
-    public void adddata() {
+    public void check() {
         loginbutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 try {
+                    SharedPreferences prefs = getSharedPreferences("UserData", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.putString("emailaddress", userEmail.getText().toString());
+                    editor.putString("pword", userPass.getText().toString());
+
+                    editor.apply();
                     firebaseAuth.signInWithEmailAndPassword(userEmail.getText().toString().trim(),
                             userPass.getText().toString())
                             .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -116,11 +112,14 @@ public class loginscreen extends AppCompatActivity {
                                             }
                                             mLastClickTime = SystemClock.elapsedRealtime();
                                             String email = userEmail.getText().toString();
+                                            String email2 = userEmail.getText().toString();
                                             email = email.replace(".", "");
                                             email = email.replace(" ", "");
 
                                             Intent i = new Intent(loginscreen.this, speechrecognition.class);
                                             i.putExtra("email_var", email);
+                                            i.putExtra("emailwithstop", email2);
+
                                             startActivity(i);
 
                                         } else {
@@ -142,6 +141,27 @@ public class loginscreen extends AppCompatActivity {
         });
     }
 
+    @Override
+    public void onBackPressed() {
 
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Are you sure you want to exit the app?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        Intent intent = new Intent(Intent.ACTION_MAIN);
+                        intent.addCategory(Intent.CATEGORY_HOME);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.cancel();
+                    }
+                });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
 }
+
 

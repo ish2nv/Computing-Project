@@ -51,7 +51,7 @@ public class forgotPassword extends AppCompatActivity {
                                         Toast.makeText(forgotPassword.this, "Reset password sent to " + email.getText().toString(),
                                                 Toast.LENGTH_LONG).show();
                                     } else {
-                                        Toast.makeText(forgotPassword.this, "Email does not exist! please try another email",
+                                        Toast.makeText(forgotPassword.this, task.getException().getMessage(),
                                                 Toast.LENGTH_LONG).show();
                                     }
 
