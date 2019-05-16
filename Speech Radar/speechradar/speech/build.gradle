@@ -30,7 +30,6 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     testImplementation 'junit:junit:4.12'
-
 }
 
 
@@ -39,7 +38,6 @@ Properties properties = new Properties()
 if (project.rootProject.file("local.properties").exists()) {
     properties.load(project.rootProject.file('local.properties').newDataInputStream())
 }
-
 
 bintray {
     user = properties.getProperty("bintray.user")
@@ -90,3 +88,4 @@ artifacts {
     archives javadocJar
     archives sourcesJar
 }
+
