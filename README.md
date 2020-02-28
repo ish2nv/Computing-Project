@@ -27,7 +27,8 @@ Hierarchy of the activities can be seen in the diagram below.
 <p align="center">
  <img src="https://github.com/ish2nv/Computing-Project/blob/master/UML-diagram/png/hierarchy%20diagram.png">
 </p>
-## Installation
 
+
+# Installation
 
 Download in PlayStore: [Speech Radar](https://play.google.com/store/apps/details?id=com.speechradar.shahishtiyaqali&hl=en_GB)
